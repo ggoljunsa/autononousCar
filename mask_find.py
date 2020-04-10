@@ -15,20 +15,35 @@ upper_blue2 = np.array([105, 255, 255])
 lower_blue3 = np.array([95, 35, 35])
 upper_blue3 = np.array([105, 255, 255])
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
+
+centerPos = [0, 0, 0]
 
 
 def drawRct(rctNum, width, height, img):
-    if rctNum == 1:
+    if rctNum == 0:
         cv2.rectangle(img, (0, 0), (int(width / 3), height), (0, 255, 0), 3)
-    elif rctNum == 2:
+    elif rctNum == 1:
         cv2.rectangle(
             img, (int(width / 3), 0), (int(width / 3 * 2), height), (255, 0, 0), 3
         )
-    elif rctNum == 3:
+    elif rctNum == 2:
         cv2.rectangle(img, (int(width / 3 * 2), 0), (width, height), (0, 0, 255), 3)
     else:
         return
+
+
+def maxPos():
+    max = -1
+    pivot = -1
+    for i in range(3):
+        if max < centerPos[i]:
+            max = centerPos[i]
+            pivot = i
+
+    drawRct(pivot, org_width, org_height, img_result)
+    for i in range(3):
+        centerPos[i] = 0
 
 
 while True:
@@ -79,18 +94,19 @@ while True:
             cv2.circle(img_color, (centerX, centerY), 10, (0, 0, 255), 10)
             cv2.rectangle(img_color, (x, y), (x + width, y + height), (0, 0, 255))
         if centerX < int(org_width / 3):
-            drawRct(1, org_width, org_height, img_result)
+            centerPos[0] += 1
         elif centerX < int(org_width / 3 * 2):
-            drawRct(2, org_width, org_height, img_result)
+            centerPos[1] += 1
         else:
-            drawRct(3, org_width, org_height, img_result)
+            centerPos[2] += 2
 
-    print(numOfLables)
+    #print(numOfLables)
+    maxPos()
 
-    if numOfLables == 1:
-        print(centroids)
-    if numOfLables == 2:
-        print("target locking sequencing activated")
+    #if numOfLables == 1:
+    #    print(centroids)
+    #if numOfLables == 2:
+    #    print("target locking sequencing activated")
 
     cv2.imshow("img_color", img_color)
     cv2.imshow("img_mask", img_mask)
